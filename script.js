@@ -9,7 +9,7 @@ const MAX_BOLETAS = 9999;
 const FECHA_SORTEO = new Date(2026, 9, 31, 20, 0, 0); 
 
 // TU URL DE GOOGLE APPS SCRIPT
-const URL_GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbyACf1FuT3WWD4wllfIo-g6ZyNHy3Uaqk3U4y_OuDRXQO7E9gi8arY0XJXmYafRKyEoBA/exec"; 
+const URL_GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbxY4C5AgjQ2tlhFK4cNaRGBiTjazYlbnj_Qum2Uwqx4R_UyNgJtu1QZEj2m4CjtBSEc/exec"; 
 
 // ==========================================
 // ESTADO DE LA APLICACIÓN
