@@ -1,7 +1,7 @@
 // ==========================================
 // CONFIGURACIÓN PRINCIPAL
 // ==========================================
-const CLAVE_HASH = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"; 
+const CLAVE_HASH = "dca73d014f885149c5c4ed29b002ad5357df21d168137214b3c7bc8eb3897bd1";
 const VALOR_BOLETA = 100000; 
 const MAX_BOLETAS = 9999;
 
