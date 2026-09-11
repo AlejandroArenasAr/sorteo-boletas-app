@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorteo - Panel de Control</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header y Estadísticas -->
+        <header>
+            <p class="subtitle">SORTEO DE CLIENTES</p>
+            <h1>Gana una bicicleta eléctrica</h1>
+            <div class="promo-banner">
+                Por cada <strong>$100.000</strong> en compras = <strong>1 boleta</strong>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span id="stat-clients" class="stat-value">0</span>
+                    <span class="stat-label">Clientes registrados</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value"><span id="stat-tickets">0</span> / 9999</span>
+                    <span class="stat-label">Boletas emitidas</span>
+                </div>
+                <div class="stat-card">
+                    <span id="stat-sales" class="stat-value">$0</span>
+                    <span class="stat-label">Total en compras</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Formulario de Registro -->
+        <section class="panel">
+            <h2>Nuevo registro</h2>
+            <p class="panel-desc">Ingresa los datos del cliente y sus facturas.</p>
+            
+            <form id="registro-form">
+                <div class="form-group">
+                    <label>Nombre del cliente</label>
+                    <input type="text" id="cliente-nombre" placeholder="Ej: María Torres" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Número de teléfono</label>
+                    <input type="tel" id="cliente-telefono" placeholder="Ej: 300 123 4567" required>
+                </div>
+
+                <div class="facturas-container">
+                    <label>Facturas</label>
+                    <div id="lista-facturas">
+                        <div class="factura-row">
+                            <input type="text" class="factura-id" placeholder="ID Factura" required>
+                            <input type="number" class="factura-monto" placeholder="Monto ($)" min="0" required>
+                            <button type="button" class="btn-remove" disabled>X</button>
+                        </div>
+                    </div>
+                    <button type="button" id="btn-add-factura" class="btn-text">+ Agregar factura</button>
+                </div>
+
+                <div class="totales-preview">
+                    <span class="label">Total comprado:</span>
+                    <strong id="preview-total">$0</strong>
+                    <span id="preview-boletas" class="boletas-count">0 boletas</span>
+                </div>
+
+            <!-- Mensaje de error -->
+
+            <div id="error-monto" class="error-msg hidden">El valor total debe ser igual o superior a $100.000 para generar boletas.</div>
+
+            <!-- Ventana Modal de Éxito  -->
+            <div id="modal-exito" class="modal-overlay hidden">
+            <div class="modal-content">
+
+            <h3>¡Registro Exitoso!</h3>
+            <p>Se han generado las siguientes boletas para el cliente:</p>
+            <div id="modal-boletas" class="boletas-grid"></div>
+            <button type="button" onclick="cerrarModal()" class="btn-primary">Aceptar y continuar</button>
+            </div>
+            </div>
+
+                <button type="submit" id="btn-submit" class="btn-primary" disabled>Registrar y generar boletas</button>
+            </form>
+        </section>
+
+        <!-- Sorteo -->
+        <section class="panel panel-sorteo">
+            <h2>Realizar el sorteo</h2>
+            <p class="panel-desc">Elige un número ganador al azar entre todas las boletas emitidas.</p>
+            <p id="sorteo-status" class="sorteo-status">El sorteo se habilitará el: <span id="fecha-sorteo-text"></span></p>
+            <button type="button" id="btn-sortear" class="btn-danger" disabled>Sortear ganador</button>
+            
+            <div id="ganador-resultado" class="ganador-box hidden">
+                <h3>¡Ganador!</h3>
+                <p id="ganador-info"></p>
+            </div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
