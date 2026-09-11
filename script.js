@@ -1,7 +1,7 @@
 // ==========================================
 // CONFIGURACIÓN PRINCIPAL
 // ==========================================
-const CLAVE_ACCESO = "SorteoPill2026*"; 
+const CLAVE_HASH = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"; 
 const VALOR_BOLETA = 100000; 
 const MAX_BOLETAS = 9999;
 
@@ -45,13 +45,22 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(consultarDatosGlobales, 15000);
 });
 
+async function generarHash(texto) {
+    const buffer = new TextEncoder().encode(texto);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 // Lógica de Validación de Contraseña
 function verificarClave(e) {
     e.preventDefault();
     const claveIngresada = document.getElementById('access-key').value.trim();
     const errorMsg = document.getElementById('login-error');
 
-    if (claveIngresada === CLAVE_ACCESO) {
+const hashIngresado = await generarHash(claveIngresada);
+
+    if (hashIngresado === CLAVE_HASH) {
         sessionStorage.setItem('acceso_concedido', 'true');
         desbloquearPantalla();
     } else {
