@@ -1,7 +1,8 @@
 // ==========================================
 // CONFIGURACIÓN PRINCIPAL
 // ==========================================
-const VALOR_BOLETA = 100000; // $100.000 COP
+const CLAVE_ACCESO = "SorteoPill2026*"; 
+const VALOR_BOLETA = 100000; 
 const MAX_BOLETAS = 9999;
 
 // FECHA PARA ACTIVAR EL SORTEO (Año, Mes (0-11), Día, Hora, Minuto)
@@ -11,7 +12,7 @@ const FECHA_SORTEO = new Date(2026, 9, 31, 20, 0, 0);
 const URL_GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbyACf1FuT3WWD4wllfIo-g6ZyNHy3Uaqk3U4y_OuDRXQO7E9gi8arY0XJXmYafRKyEoBA/exec"; 
 
 // ==========================================
-// ESTADO DE LA APLICACIÓN (Ahora es global)
+// ESTADO DE LA APLICACIÓN
 // ==========================================
 let db = {
     boletasAsignadas: [],
@@ -23,24 +24,47 @@ let db = {
 };
 
 // ==========================================
-// INTERFAZ Y EVENTOS
+// INTERFAZ, SEGURIDAD Y EVENTOS
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-    // Primera carga de datos desde el servidor
-    consultarDatosGlobales();
-    
+    // 1. Evento para el formulario de Login
+    document.getElementById('login-form').addEventListener('submit', verificarClave);
+
+    // 2. Comprobar si ya ingresó la contraseña anteriormente en esta sesión
+    if (sessionStorage.getItem('acceso_concedido') === 'true') {
+        desbloquearPantalla();
+    }
+
     document.getElementById('fecha-sorteo-text').innerText = FECHA_SORTEO.toLocaleString('es-CO');
     document.getElementById('btn-add-factura').addEventListener('click', agregarFilaFactura);
     document.getElementById('lista-facturas').addEventListener('input', calcularTotales);
     document.getElementById('registro-form').addEventListener('submit', procesarRegistro);
     document.getElementById('btn-sortear').addEventListener('click', realizarSorteo);
     
-    // Validar botón de sorteo cada segundo
     setInterval(validarFechaSorteo, 1000);
-    
-    // Sincronizar datos con el servidor cada 15 segundos para ver lo que hacen otros asesores
     setInterval(consultarDatosGlobales, 15000);
 });
+
+// Lógica de Validación de Contraseña
+function verificarClave(e) {
+    e.preventDefault();
+    const claveIngresada = document.getElementById('access-key').value.trim();
+    const errorMsg = document.getElementById('login-error');
+
+    if (claveIngresada === CLAVE_ACCESO) {
+        sessionStorage.setItem('acceso_concedido', 'true');
+        desbloquearPantalla();
+    } else {
+        errorMsg.classList.remove('hidden');
+        document.getElementById('access-key').value = '';
+    }
+}
+
+function desbloquearPantalla() {
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('app-content').classList.remove('hidden');
+    consultarDatosGlobales();
+}
 
 function agregarFilaFactura() {
     const container = document.getElementById('lista-facturas');
@@ -129,7 +153,6 @@ async function procesarRegistro(e) {
     };
 
     try {
-        // Enviar datos a Google Sheets para que genere los números seguros
         const respuesta = await fetch(URL_GOOGLE_SCRIPT, {
             method: 'POST',
             body: JSON.stringify(nuevoCliente),
@@ -139,13 +162,9 @@ async function procesarRegistro(e) {
         const resultado = await respuesta.json();
 
         if (resultado.estado === "exito") {
-            // Mostrar modal con los números que Google Sheets asignó
             mostrarModalExito(resultado.boletas);
-            
-            // Refrescar los totales en pantalla
             consultarDatosGlobales();
 
-            // Limpiar formulario
             e.target.reset();
             document.getElementById('lista-facturas').innerHTML = `
                 <div class="factura-row">
@@ -166,14 +185,12 @@ async function procesarRegistro(e) {
     }
 }
 
-// Consulta a Google Drive los totales acumulados de todos los asesores
 async function consultarDatosGlobales() {
     if (!URL_GOOGLE_SCRIPT) return;
     try {
         const res = await fetch(URL_GOOGLE_SCRIPT);
         const data = await res.json();
         
-        // Actualizamos estado global
         db.estadisticas.totalClientes = data.totalClientes;
         db.estadisticas.totalBoletas = data.totalBoletas;
         db.estadisticas.totalVentas = data.totalVentas;
