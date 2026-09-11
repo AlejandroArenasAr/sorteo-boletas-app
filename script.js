@@ -1,7 +1,7 @@
 // ==========================================
 // CONFIGURACIÓN PRINCIPAL
 // ==========================================
-const CLAVE_HASH = "dca73d014f885149c5c4ed29b002ad5357df21d168137214b3c7bc8eb3897bd1";
+const CLAVE_HASH = 80132333;
 const VALOR_BOLETA = 100000; 
 const MAX_BOLETAS = 9999;
 
@@ -45,22 +45,23 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(consultarDatosGlobales, 15000);
 });
 
-async function generarHash(texto) {
-    const buffer = new TextEncoder().encode(texto);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+function generarHashSimple(texto) {
+    let hash = 0;
+    for (let i = 0; i < texto.length; i++) {
+        const char = texto.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convertir a entero de 32 bits
+    }
+    return hash;
 }
-
 // Lógica de Validación de Contraseña
 function verificarClave(e) {
     e.preventDefault();
     const claveIngresada = document.getElementById('access-key').value.trim();
     const errorMsg = document.getElementById('login-error');
 
-const hashIngresado = await generarHash(claveIngresada);
-
-    if (hashIngresado === CLAVE_HASH) {
+    // Comparamos el hash generado con la clave ingresada
+    if (generarHashSimple(claveIngresada) === CLAVE_HASH) {
         sessionStorage.setItem('acceso_concedido', 'true');
         desbloquearPantalla();
     } else {
