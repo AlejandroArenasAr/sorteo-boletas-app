@@ -7,7 +7,24 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="app-container">
+
+    <!-- PANTALLA DE ACCESO / CONTRASEÑA -->
+    <div id="login-screen" class="login-overlay">
+        <div class="login-card">
+            <h2>Acceso Restringido 🔒</h2>
+            <p>Ingresa la contraseña para acceder al sistema de boletas.</p>
+            <form id="login-form">
+                <div class="form-group">
+                    <input type="password" id="access-key" placeholder="Ingresa la contraseña" required autocomplete="off">
+                </div>
+                <div id="login-error" class="error-msg hidden">Clave incorrecta. Inténtalo de nuevo.</div>
+                <button type="submit" class="btn-primary">Ingresar al Sistema</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL (Oculto por defecto) -->
+    <div class="app-container hidden" id="app-content">
         <!-- Header y Estadísticas -->
         <header>
             <p class="subtitle">SORTEO DE CLIENTES</p>
@@ -66,20 +83,7 @@
                     <span id="preview-boletas" class="boletas-count">0 boletas</span>
                 </div>
 
-            <!-- Mensaje de error -->
-
-            <div id="error-monto" class="error-msg hidden">El valor total debe ser igual o superior a $100.000 para generar boletas.</div>
-
-            <!-- Ventana Modal de Éxito  -->
-            <div id="modal-exito" class="modal-overlay hidden">
-            <div class="modal-content">
-
-            <h3>¡Registro Exitoso!</h3>
-            <p>Se han generado las siguientes boletas para el cliente:</p>
-            <div id="modal-boletas" class="boletas-grid"></div>
-            <button type="button" onclick="cerrarModal()" class="btn-primary">Aceptar y continuar</button>
-            </div>
-            </div>
+                <div id="error-monto" class="error-msg hidden">El valor total debe ser igual o superior a $100.000 para generar boletas.</div>
 
                 <button type="submit" id="btn-submit" class="btn-primary" disabled>Registrar y generar boletas</button>
             </form>
@@ -97,6 +101,16 @@
                 <p id="ganador-info"></p>
             </div>
         </section>
+    </div>
+
+    <!-- Ventana Modal de Éxito -->
+    <div id="modal-exito" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3>¡Registro Exitoso!</h3>
+            <p>Se han generado las siguientes boletas para el cliente:</p>
+            <div id="modal-boletas" class="boletas-grid"></div>
+            <button type="button" onclick="cerrarModal()" class="btn-primary">Aceptar y continuar</button>
+        </div>
     </div>
 
     <script src="script.js"></script>
