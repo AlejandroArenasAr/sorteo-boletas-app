@@ -61,8 +61,18 @@ function verificarClave(e) {
 }
 
 function desbloquearPantalla() {
-    document.getElementById('login-screen').classList.add('hidden');
-    document.getElementById('app-content').classList.remove('hidden');
+    const loginScreen = document.getElementById('login-screen');
+    const appContent = document.getElementById('app-content');
+
+    // Ocultar pantalla de login
+    loginScreen.classList.add('hidden');
+    loginScreen.style.display = 'none';
+
+    // Mostrar aplicación principal
+    appContent.classList.remove('hidden');
+    appContent.style.display = 'block';
+
+    // Cargar datos globales desde Google Sheets
     consultarDatosGlobales();
 }
 
