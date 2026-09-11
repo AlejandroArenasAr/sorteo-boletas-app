@@ -1,191 +1,49 @@
+/* ==========================================
+   VARIABLES Y ESTILOS GLOBALES
+   ========================================== */
 :root {
-    --bg-color: #0b101e;
-    --panel-bg: #151b2b;
-    --text-main: #ffffff;
-    --text-muted: #8b95a5;
-    --accent-color: #ccff00;
-    --accent-hover: #b3e600;
-    --danger-color: #ff6b6b;
-    --border-color: #2a3441;
+    --bg-color: #0b0f19;
+    --panel-bg: #111827;
+    --input-bg: #1f293d;
+    --border-color: #374151;
+    --text-primary: #f9fafb;
+    --text-muted: #9ca3af;
+    --accent-color: #ccff00;
+    --accent-hover: #b3e600;
+    --danger-color: #ef4444;
+    --danger-hover: #dc2626;
 }
 
 * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 
 body {
-    background-color: var(--bg-color);
-    color: var(--text-main);
-    padding: 20px;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
 }
 
-.app-container {
-    max-width: 600px;
-    margin: 0 auto;
+/* Regla de ocultamiento estricta */
+.hidden {
+    display: none !important;
 }
-
-/* Header & Stats */
-header { margin-bottom: 24px; }
-.subtitle { color: var(--accent-color); font-size: 12px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px;}
-h1 { font-size: 24px; margin-bottom: 16px; }
-
-.promo-banner {
-    background-color: rgba(204, 255, 0, 0.1);
-    border: 1px solid rgba(204, 255, 0, 0.2);
-    padding: 12px;
-    border-radius: 8px;
-    font-size: 14px;
-    margin-bottom: 24px;
-}
-.promo-banner strong { color: var(--accent-color); }
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-}
-
-.stat-card {
-    background: var(--panel-bg);
-    padding: 16px;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-}
-
-.stat-value { font-size: 20px; font-weight: bold; margin-bottom: 4px; color: var(--accent-color); }
-.stat-label { font-size: 11px; color: var(--text-muted); }
-
-/* Panels */
-.panel {
-    background-color: var(--panel-bg);
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 24px;
-    border: 1px solid var(--border-color);
-}
-
-.panel h2 { font-size: 18px; margin-bottom: 8px; }
-.panel-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
-
-/* Forms */
-.form-group, .facturas-container { margin-bottom: 16px; }
-label { display: block; font-size: 12px; margin-bottom: 8px; color: var(--text-muted); }
-input {
-    width: 100%;
-    background-color: #0b101e;
-    border: 1px solid var(--border-color);
-    color: white;
-    padding: 12px;
-    border-radius: 6px;
-    outline: none;
-}
-input:focus { border-color: var(--accent-color); }
-
-.factura-row {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 8px;
-}
-.factura-row input { flex: 1; }
-
-/* Buttons */
-.btn-remove {
-    background: var(--border-color); color: white; border: none; padding: 0 16px; border-radius: 6px; cursor: pointer;
-}
-.btn-remove:disabled { opacity: 0.5; cursor: not-allowed; }
-
-.btn-text {
-    background: none; color: var(--text-muted); border: none; cursor: pointer; font-size: 13px; margin-top: 8px;
-}
-.btn-text:hover { color: white; }
-
-.btn-primary {
-    width: 100%; background: var(--accent-color); color: #000; border: none; padding: 14px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 16px; transition: 0.2s;
-}
-.btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
-.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-
-.btn-danger {
-    width: 100%; background: var(--danger-color); color: white; border: none; padding: 14px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s;
-}
-.btn-danger:disabled { background: #3a2b30; color: #6b5a5e; cursor: not-allowed; }
-
-/* Totals Preview */
-.totales-preview {
-    margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color); display: flex; flex-direction: column;
-}
-.totales-preview .label { font-size: 12px; color: var(--text-muted); }
-.totales-preview strong { font-size: 24px; margin: 4px 0; }
-.boletas-count { font-size: 13px; color: var(--accent-color); }
-
-/* Sorteo section */
-.sorteo-status { font-size: 13px; margin-bottom: 16px; color: var(--text-muted); }
-.ganador-box { margin-top: 20px; padding: 16px; background-color: rgba(204, 255, 0, 0.1); border: 1px solid var(--accent-color); border-radius: 8px; text-align: center; }
-.ganador-box h3 { color: var(--accent-color); margin-bottom: 8px; }
-.hidden { display: none; }
-
-/* Errores y Modales */
-.error-msg {
-    color: var(--danger-color);
-    font-size: 13px;
-    margin-top: 12px;
-    text-align: center;
-}
-
-.modal-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(11, 16, 30, 0.9);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 1000;
-}
-
-.modal-content {
-    background: var(--panel-bg);
-    padding: 32px;
-    border-radius: 12px;
-    border: 1px solid var(--accent-color);
-    text-align: center;
-    max-width: 400px;
-    width: 90%;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
-
-.modal-content h3 { color: var(--accent-color); margin-bottom: 12px; font-size: 22px; }
-.modal-content p { color: var(--text-muted); font-size: 14px; }
-
-.boletas-grid {
-    display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 20px 0;
-}
-
-.boleta-item {
-    background: rgba(204, 255, 0, 0.1);
-    color: var(--accent-color);
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-weight: bold;
-    border: 1px solid rgba(204, 255, 0, 0.3);
-    font-size: 18px;
-}
-
-
-.modal-overlay.hidden {
-    display: none !important;
-}
-
 
 /* ==========================================
-   PANTALLA DE LOGIN Y SEGURIDAD
+   PANTALLA DE ACCESO / SEGURIDAD
    ========================================== */
 .login-overlay {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     background-color: var(--bg-color);
     display: flex;
     align-items: center;
@@ -199,7 +57,7 @@ input:focus { border-color: var(--accent-color); }
     border-radius: 12px;
     border: 1px solid var(--border-color);
     text-align: center;
-    max-width: 380px;
+    max-width: 400px;
     width: 90%;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
@@ -207,30 +65,277 @@ input:focus { border-color: var(--accent-color); }
 .login-card h2 {
     color: var(--accent-color);
     margin-bottom: 8px;
-    font-size: 20px;
+    font-size: 22px;
 }
 
 .login-card p {
     color: var(--text-muted);
-    font-size: 13px;
+    font-size: 14px;
     margin-bottom: 20px;
 }
 
-/* Agrega esto al final de styles.css */
-.login-overlay.hidden {
-    display: none !important;
+/* ==========================================
+   ESTRUCTURA PRINCIPAL DE LA APLICACIÓN
+   ========================================== */
+.app-container {
+    max-width: 600px;
+    width: 100%;
+    margin: 0 auto;
 }
 
-/* Mejora de centrado para la tarjeta de login */
-.login-overlay {
+header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.subtitle {
+    color: var(--text-muted);
+    font-size: 12px;
+    letter-spacing: 2px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+h1 {
+    font-size: 26px;
+    margin: 6px 0 12px;
+}
+
+.promo-banner {
+    background: rgba(204, 255, 0, 0.1);
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+/* TARJETAS DE ESTADÍSTICAS */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.stat-value {
+    display: block;
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--accent-color);
+}
+
+.stat-label {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+/* FORMULARIO Y PANELES */
+.panel {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.panel h2 {
+    font-size: 18px;
+    margin-bottom: 4px;
+}
+
+.panel-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+input[type="text"],
+input[type="tel"],
+input[type="number"],
+input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 14px;
+    outline: none;
+}
+
+input:focus {
+    border-color: var(--accent-color);
+}
+
+/* FILAS DINÁMICAS DE FACTURAS */
+.facturas-container {
+    margin-bottom: 16px;
+}
+
+.factura-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.btn-remove {
+    background: var(--danger-color);
+    color: white;
+    border: none;
+    padding: 0 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-remove:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.btn-text {
+    background: none;
+    border: none;
+    color: var(--accent-color);
+    font-size: 13px;
+    cursor: pointer;
+    padding: 4px 0;
+}
+
+/* PREVIEW Y ACCIONES */
+.totales-preview {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--input-bg);
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+}
+
+.boletas-count {
+    background: var(--accent-color);
+    color: #000;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.btn-primary {
+    width: 100%;
+    background: var(--accent-color);
+    color: #000;
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-primary:hover {
+    background: var(--accent-hover);
+}
+
+.btn-primary:disabled {
+    background: #374151;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+
+.btn-danger {
+    width: 100%;
+    background: var(--danger-color);
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-danger:disabled {
+    background: #374151;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+
+.error-msg {
+    color: var(--danger-color);
+    font-size: 12px;
+    margin-bottom: 12px;
+}
+
+/* VENTANAS MODALES Y SORTEO */
+.modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: var(--bg-color);
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 2000;
+    z-index: 3000;
+}
+
+.modal-content {
+    background: var(--panel-bg);
+    padding: 24px;
+    border-radius: 12px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    border: 1px solid var(--border-color);
+}
+
+.boletas-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin: 16px 0;
+}
+
+.boleta-item {
+    background: var(--accent-color);
+    color: #000;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.ganador-box {
+    margin-top: 16px;
+    background: var(--input-bg);
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid var(--accent-color);
 }
