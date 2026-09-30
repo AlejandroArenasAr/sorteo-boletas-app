@@ -7,7 +7,7 @@ const MAX_BOLETAS_EN_MODAL = 20; // Si un registro genera más, no se listan (se
 const TAMANO_LOTE = 50; // Clientes por petición al Apps Script en la carga masiva
 
 // FECHA PARA ACTIVAR EL SORTEO (Año, Mes (0-11), Día, Hora, Minuto)
-const FECHA_SORTEO = new Date(2026, 09, 29, 20, 0, 0); 
+const FECHA_SORTEO = new Date(2026, 08, 29, 20, 0, 0); 
 
 // TU URL DE GOOGLE APPS SCRIPT
 const URL_GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbwrE6flGO916WjWD0w6VIFAy_t8GWuLDSw3qhhmN-dTo83Nh7YveWWIZgQb1_iK147w/exec"; 
