@@ -10,7 +10,7 @@ const TAMANO_LOTE = 50; // Clientes por petición al Apps Script en la carga mas
 const FECHA_SORTEO = new Date(2026, 9, 31, 20, 0, 0); 
 
 // TU URL DE GOOGLE APPS SCRIPT
-const URL_GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbyACf1FuT3WWD4wllfIo-g6ZyNHy3Uaqk3U4y_OuDRXQO7E9gi8arY0XJXmYafRKyEoBA/exec"; 
+const URL_GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbwrE6flGO916WjWD0w6VIFAy_t8GWuLDSw3qhhmN-dTo83Nh7YveWWIZgQb1_iK147w/exec"; 
 
 // ==========================================
 // ESTADO DE LA APLICACIÓN (Ahora es global)
