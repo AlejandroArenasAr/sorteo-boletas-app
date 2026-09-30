@@ -7,7 +7,7 @@ const MAX_BOLETAS_EN_MODAL = 20; // Si un registro genera más, no se listan (se
 const TAMANO_LOTE = 50; // Clientes por petición al Apps Script en la carga masiva
 
 // FECHA PARA ACTIVAR EL SORTEO (Año, Mes (0-11), Día, Hora, Minuto)
-const FECHA_SORTEO = new Date(2026, 08, 29, 20, 0, 0); 
+const FECHA_SORTEO = new Date(2026, 8, 29, 20, 0, 0);
 
 // TU URL DE GOOGLE APPS SCRIPT
 const URL_GOOGLE_SCRIPT = "https://script.google.com/macros/s/AKfycbwrE6flGO916WjWD0w6VIFAy_t8GWuLDSw3qhhmN-dTo83Nh7YveWWIZgQb1_iK147w/exec"; 
@@ -36,6 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('lista-facturas').addEventListener('input', calcularTotales);
     document.getElementById('registro-form').addEventListener('submit', procesarRegistro);
     document.getElementById('btn-sortear').addEventListener('click', realizarSorteo);
+    document.getElementById('btn-cerrar-sorteo').addEventListener('click', cerrarSorteo);
     document.getElementById('archivo-masivo').addEventListener('change', leerArchivoMasivo);
     document.getElementById('btn-cargar-masivo').addEventListener('click', procesarCargaMasiva);
     document.getElementById('btn-detener-masivo').addEventListener('click', detenerCargaMasiva);
@@ -160,10 +161,10 @@ async function procesarRegistro(e) {
                 </div>
             `;
         } else {
-            alert("Error: " + resultado.mensaje);
+            mostrarDialogo({ tipo: 'error', titulo: 'No se pudo registrar', mensaje: resultado.mensaje });
         }
     } catch (error) {
-        alert("Ocurrió un error al conectar con Google Drive. Por favor, reintenta.");
+        mostrarDialogo({ tipo: 'error', titulo: 'Error de conexión', mensaje: 'Ocurrió un error al conectar con Google Drive. Por favor, reintenta.' });
         console.error(error);
     } finally {
         btnSubmit.innerText = "Registrar y generar boletas";
@@ -238,7 +239,7 @@ async function leerArchivoMasivo(e) {
     if (!archivo) return;
 
     if (typeof XLSX === 'undefined') {
-        alert("No se pudo cargar el lector de Excel. Revisa tu conexión a internet y recarga la página.");
+        mostrarDialogo({ tipo: 'error', titulo: 'Lector de Excel no disponible', mensaje: 'No se pudo cargar el lector de Excel. Revisa tu conexión a internet y recarga la página.' });
         return;
     }
 
@@ -251,7 +252,7 @@ async function leerArchivoMasivo(e) {
         cargaMasiva.clientes = clientes;
         mostrarResumenMasivo(clientes, errores);
     } catch (error) {
-        alert("No se pudo leer el archivo: " + error.message);
+        mostrarDialogo({ tipo: 'error', titulo: 'No se pudo leer el archivo', mensaje: error.message });
         console.error(error);
     }
 }
@@ -429,7 +430,13 @@ async function procesarCargaMasiva() {
     if (clientes.length === 0) return;
 
     const totalBoletas = clientes.reduce((s, c) => s + c.boletas, 0);
-    if (!confirm(`Se registrarán ${clientes.length} cliente(s) y se generarán ${totalBoletas} boleta(s) en la base de datos. ¿Continuar?`)) return;
+    const confirmado = await mostrarDialogo({
+        titulo: 'Confirmar carga masiva',
+        mensaje: `Se registrarán ${clientes.length} cliente(s) y se generarán ${totalBoletas} boleta(s) en la base de datos.\n\n¿Deseas continuar?`,
+        textoAceptar: 'Sí, registrar',
+        textoCancelar: 'Cancelar'
+    });
+    if (!confirmado) return;
 
     const btnCargar = document.getElementById('btn-cargar-masivo');
     const btnDetener = document.getElementById('btn-detener-masivo');
@@ -613,6 +620,34 @@ function cerrarModal() {
     document.getElementById('modal-exito').classList.add('hidden');
 }
 
+// Ventana de aviso o confirmación con el estilo de la app (reemplaza alert y confirm del navegador).
+// Devuelve una promesa: true si se pulsa Aceptar, false si se cancela o se pulsa Escape.
+function mostrarDialogo({ titulo, mensaje, tipo = 'info', textoAceptar = 'Aceptar', textoCancelar = '' }) {
+    const dialogo = document.getElementById('dialogo');
+    const btnAceptar = document.getElementById('dialogo-aceptar');
+    const btnCancelar = document.getElementById('dialogo-cancelar');
+
+    document.getElementById('dialogo-titulo').innerText = titulo;
+    document.getElementById('dialogo-texto').innerText = mensaje;
+    dialogo.classList.toggle('dialogo-error', tipo === 'error');
+    btnAceptar.innerText = textoAceptar;
+    btnCancelar.innerText = textoCancelar;
+    btnCancelar.classList.toggle('hidden', !textoCancelar);
+    dialogo.classList.remove('hidden');
+    btnAceptar.focus();
+
+    return new Promise(resolve => {
+        const cerrar = respuesta => {
+            dialogo.classList.add('hidden');
+            btnAceptar.onclick = btnCancelar.onclick = dialogo.onkeydown = null;
+            resolve(respuesta);
+        };
+        btnAceptar.onclick = () => cerrar(true);
+        btnCancelar.onclick = () => cerrar(false);
+        dialogo.onkeydown = e => { if (e.key === 'Escape') cerrar(false); };
+    });
+}
+
 function formatoPesos(valor) {
     return new Intl.NumberFormat('es-CO', {
         style: 'currency',
@@ -630,13 +665,15 @@ function actualizarDashboard() {
     document.getElementById('stat-sales').innerText = formatoPesos(db.estadisticas.totalVentas);
 }
 
+let sorteoEnCurso = false;
+
 function validarFechaSorteo() {
     const btnSortear = document.getElementById('btn-sortear');
     const statusText = document.getElementById('sorteo-status');
     const ahora = new Date();
 
     if (ahora >= FECHA_SORTEO) {
-        btnSortear.disabled = false;
+        btnSortear.disabled = sorteoEnCurso;
         statusText.innerText = "¡El sorteo está habilitado!";
         statusText.style.color = "var(--accent-color)";
     } else {
@@ -644,22 +681,139 @@ function validarFechaSorteo() {
     }
 }
 
-function realizarSorteo() {
+// Entero aleatorio entre 0 y max-1 con el generador criptográfico del navegador (sin sesgo)
+function enteroAleatorio(max) {
+    const limite = Math.floor(0x100000000 / max) * max;
+    let valor;
+    do {
+        valor = crypto.getRandomValues(new Uint32Array(1))[0];
+    } while (valor >= limite);
+    return valor % max;
+}
+
+// Pide a Google Sheets el nombre del dueño de la boleta; null si no está disponible
+async function buscarGanador(numero) {
+    try {
+        const respuesta = await fetch(`${URL_GOOGLE_SCRIPT}?boleta=${numero}`);
+        const data = await respuesta.json();
+        return data.estado === 'exito' && data.nombre ? data : null;
+    } catch (error) {
+        console.error("Error consultando el ganador", error);
+        return null;
+    }
+}
+
+async function realizarSorteo() {
+    const btnSortear = document.getElementById('btn-sortear');
+    const modal = document.getElementById('modal-sorteo');
+    const etapa = document.getElementById('sorteo-etapa');
+    const titulo = document.getElementById('sorteo-titulo');
+    const cajaGanador = document.getElementById('sorteo-ganador');
+    const btnCerrar = document.getElementById('btn-cerrar-sorteo');
+    const reels = [...document.querySelectorAll('.reel')];
+
+    sorteoEnCurso = true;
+    btnSortear.disabled = true;
+    reels.forEach(reel => { reel.innerText = '0'; reel.classList.remove('fija'); });
+    document.getElementById('sorteo-barra').style.width = '0%';
+    cajaGanador.innerHTML = '';
+    btnCerrar.classList.add('hidden');
+    titulo.innerText = 'Sorteo en curso';
+    etapa.innerText = 'Actualizando boletas…';
+    modal.classList.remove('hidden');
+
+    // Se sortea con las boletas más recientes de la base de datos
+    await consultarDatosGlobales();
     if (db.boletasAsignadas.length === 0) {
-        alert("No hay boletas asignadas para realizar el sorteo.");
+        modal.classList.add('hidden');
+        sorteoEnCurso = false;
+        validarFechaSorteo();
+        mostrarDialogo({ tipo: 'error', titulo: 'Sin boletas', mensaje: 'No hay boletas asignadas para realizar el sorteo.' });
         return;
     }
 
-    const indiceGanador = Math.floor(Math.random() * db.boletasAsignadas.length);
-    const numeroGanador = db.boletasAsignadas[indiceGanador];
+    const numeroGanador = db.boletasAsignadas[enteroAleatorio(db.boletasAsignadas.length)];
+    const consultaGanador = buscarGanador(numeroGanador); // se consulta mientras corre la animación
 
-    const cajaResultado = document.getElementById('ganador-resultado');
-    const infoSorteo = document.getElementById('ganador-info');
-    
-    infoSorteo.innerHTML = `
-        <strong>¡Tenemos un número ganador!</strong><br><br>
-        <span style="font-size: 24px; color: var(--accent-color);">Boleto #${numeroGanador.toString().padStart(4, '0')}</span><br><br>
-        <em>Por favor, revisa el archivo de Google Sheets para confirmar el nombre y teléfono del cliente ganador.</em>
-    `;
-    cajaResultado.classList.remove('hidden');
+    await animarSorteo(numeroGanador);
+    const ganador = await consultaGanador;
+    const boletaTexto = `Boleta #${numeroGanador.toString().padStart(4, '0')}`;
+
+    // Revelación en la ventana del sorteo
+    etapa.innerText = boletaTexto;
+    titulo.innerText = '¡Tenemos ganador!';
+    const nombre = document.createElement('p');
+    nombre.className = 'ganador-nombre';
+    nombre.innerText = ganador ? ganador.nombre : 'Nombre no disponible';
+    const detalle = document.createElement('p');
+    detalle.className = 'ganador-detalle';
+    detalle.innerText = ganador
+        ? (ganador.telefonoFinal ? `Teléfono terminado en ${ganador.telefonoFinal}` : '')
+        : `Busca la boleta #${numeroGanador.toString().padStart(4, '0')} en Google Sheets para ver el nombre.`;
+    cajaGanador.append(nombre, detalle);
+    btnCerrar.classList.remove('hidden');
+    btnCerrar.focus();
+    lanzarConfeti(modal);
+
+    // Resultado fijo en el panel del sorteo
+    document.getElementById('ganador-boleta').innerText = boletaTexto;
+    document.getElementById('ganador-nombre').innerText = nombre.innerText;
+    document.getElementById('ganador-detalle').innerText = detalle.innerText;
+    document.getElementById('ganador-resultado').classList.remove('hidden');
+
+    sorteoEnCurso = false;
+    validarFechaSorteo();
+}
+
+// Animación tipo tragamonedas: los 4 dígitos giran y se van fijando de izquierda a derecha
+function animarSorteo(numero) {
+    const DURACION = 10000;
+    const FIJAR_EN = [6000, 7200, 8400, 9600]; // ms en que se detiene cada dígito
+    const MENSAJES = [[0, 'Mezclando boletas…'], [3000, 'Eligiendo el número ganador…'], [6000, '¡Ya casi!']];
+    const digitos = numero.toString().padStart(4, '0').split('');
+    const reels = [...document.querySelectorAll('.reel')];
+    const barra = document.getElementById('sorteo-barra');
+    const etapa = document.getElementById('sorteo-etapa');
+
+    // Con setInterval (no requestAnimationFrame) el sorteo termina aunque la pestaña quede en segundo plano
+    return new Promise(resolve => {
+        const inicio = performance.now();
+        const intervalo = setInterval(() => {
+            const t = performance.now() - inicio;
+            reels.forEach((reel, i) => {
+                if (t < FIJAR_EN[i]) {
+                    reel.innerText = Math.floor(Math.random() * 10);
+                } else if (!reel.classList.contains('fija')) {
+                    reel.innerText = digitos[i];
+                    reel.classList.add('fija');
+                }
+            });
+            barra.style.width = `${Math.min(100, (t / DURACION) * 100)}%`;
+            etapa.innerText = MENSAJES.filter(([desde]) => t >= desde).pop()[1];
+
+            if (t >= DURACION) {
+                clearInterval(intervalo);
+                resolve();
+            }
+        }, 70);
+    });
+}
+
+function lanzarConfeti(contenedor) {
+    const COLORES = ['#ccff00', '#ffffff', '#ff6b6b', '#8b95a5'];
+    for (let i = 0; i < 60; i++) {
+        const pieza = document.createElement('span');
+        pieza.className = 'confeti';
+        pieza.style.left = `${Math.random() * 100}%`;
+        pieza.style.background = COLORES[i % COLORES.length];
+        pieza.style.animationDelay = `${Math.random() * 0.8}s`;
+        pieza.style.animationDuration = `${2.5 + Math.random() * 2}s`;
+        contenedor.appendChild(pieza);
+        setTimeout(() => pieza.remove(), 5500);
+    }
+}
+
+function cerrarSorteo() {
+    document.getElementById('modal-sorteo').classList.add('hidden');
+    document.querySelectorAll('.confeti').forEach(pieza => pieza.remove());
 }

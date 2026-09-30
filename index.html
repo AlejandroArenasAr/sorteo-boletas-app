@@ -146,9 +146,38 @@
             
             <div id="ganador-resultado" class="ganador-box hidden">
                 <h3>¡Ganador!</h3>
-                <p id="ganador-info"></p>
+                <span id="ganador-boleta" class="ganador-boleta"></span>
+                <span id="ganador-nombre" class="ganador-nombre"></span>
+                <span id="ganador-detalle" class="ganador-detalle"></span>
+                <em class="ganador-nota">Confirma los datos en Google Sheets antes de contactar al ganador.</em>
             </div>
         </section>
+    </div>
+
+    <!-- Ventana del sorteo (animación de ~10 s y revelación del ganador) -->
+    <div id="modal-sorteo" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="sorteo-titulo">
+        <div class="modal-content modal-sorteo">
+            <p id="sorteo-etapa" class="subtitle">Preparando el sorteo…</p>
+            <h3 id="sorteo-titulo">Sorteo en curso</h3>
+            <div class="reels" aria-hidden="true">
+                <span class="reel">0</span><span class="reel">0</span><span class="reel">0</span><span class="reel">0</span>
+            </div>
+            <div class="barra"><div id="sorteo-barra" class="barra-relleno"></div></div>
+            <div id="sorteo-ganador" class="sorteo-ganador" aria-live="polite"></div>
+            <button type="button" id="btn-cerrar-sorteo" class="btn-primary hidden">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Ventana de avisos y confirmaciones (reemplaza las alertas del navegador) -->
+    <div id="dialogo" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="dialogo-titulo">
+        <div class="modal-content">
+            <h3 id="dialogo-titulo"></h3>
+            <p id="dialogo-texto"></p>
+            <div class="dialogo-botones">
+                <button type="button" id="dialogo-cancelar" class="btn-cancelar hidden">Cancelar</button>
+                <button type="button" id="dialogo-aceptar" class="btn-primary">Aceptar</button>
+            </div>
+        </div>
     </div>
 
     <!-- SheetJS: lectura/escritura de archivos Excel en el navegador -->

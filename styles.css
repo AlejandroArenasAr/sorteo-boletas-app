@@ -132,7 +132,64 @@ input:focus { border-color: var(--accent-color); }
 .sorteo-status { font-size: 13px; margin-bottom: 16px; color: var(--text-muted); }
 .ganador-box { margin-top: 20px; padding: 16px; background-color: rgba(204, 255, 0, 0.1); border: 1px solid var(--accent-color); border-radius: 8px; text-align: center; }
 .ganador-box h3 { color: var(--accent-color); margin-bottom: 8px; }
+.ganador-box span, .ganador-box em { display: block; }
+.ganador-boleta { font-size: 24px; color: var(--accent-color); margin: 4px 0 8px; }
+.ganador-box .ganador-nombre { font-size: 20px; font-weight: bold; overflow-wrap: anywhere; }
+.ganador-box .ganador-detalle { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+.ganador-box .ganador-detalle:empty { display: none; }
+.ganador-nota { font-size: 12px; color: var(--text-muted); margin-top: 12px; }
 .hidden { display: none; }
+
+/* Ventana del sorteo */
+#modal-sorteo { overflow: hidden; }
+.modal-content.modal-sorteo { max-width: 440px; }
+.modal-content.modal-sorteo h3 { margin-bottom: 20px; }
+.reels { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
+.reel {
+    width: 64px; height: 84px; display: flex; align-items: center; justify-content: center;
+    background: var(--bg-color); border: 2px solid var(--border-color); border-radius: 10px;
+    font-size: 44px; font-weight: bold; color: var(--text-muted); font-variant-numeric: tabular-nums;
+}
+.reel.fija {
+    color: var(--accent-color); border-color: var(--accent-color);
+    box-shadow: 0 0 18px rgba(204, 255, 0, 0.35); animation: fijar-digito 0.35s ease-out;
+}
+@keyframes fijar-digito { from { transform: scale(1.25); } to { transform: scale(1); } }
+
+.sorteo-ganador { margin-top: 20px; }
+.sorteo-ganador:empty { display: none; }
+.modal-sorteo .ganador-nombre {
+    color: var(--text-main); font-size: 26px; font-weight: bold; margin-bottom: 4px;
+    overflow-wrap: anywhere; animation: aparecer 0.5s ease-out;
+}
+.modal-sorteo .ganador-detalle { font-size: 13px; }
+@keyframes aparecer { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+.confeti {
+    position: absolute; top: -14px; width: 8px; height: 14px; border-radius: 2px;
+    pointer-events: none; animation-name: caer; animation-timing-function: linear; animation-fill-mode: forwards;
+}
+@keyframes caer { to { transform: translateY(105vh) rotate(720deg); opacity: 0.5; } }
+
+@media (max-width: 420px) {
+    .reel { width: 52px; height: 70px; font-size: 36px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .confeti { display: none; }
+    .reel.fija, .modal-sorteo .ganador-nombre { animation: none; }
+}
+
+/* Ventana de avisos y confirmaciones */
+#dialogo { z-index: 1100; }
+.dialogo-botones { display: flex; gap: 10px; margin-top: 16px; }
+.dialogo-botones button { flex: 1; margin-top: 0; }
+.btn-cancelar {
+    background: transparent; color: var(--text-main); border: 1px solid var(--border-color);
+    padding: 14px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s;
+}
+.btn-cancelar:hover { border-color: var(--text-muted); }
+.dialogo-error .modal-content { border-color: var(--danger-color); }
+.dialogo-error .modal-content h3 { color: var(--danger-color); }
 
 /* Carga masiva */
 .masivo-pasos { display: flex; flex-direction: column; gap: 16px; }
