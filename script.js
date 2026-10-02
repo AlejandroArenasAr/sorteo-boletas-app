@@ -194,7 +194,7 @@ async function consultarDatosGlobales() {
 // ==========================================
 // CARGA MASIVA DESDE EXCEL
 // ==========================================
-// Cada fila del Excel es una factura. Las filas con el mismo teléfono se agrupan
+// Cada fila del Excel es una factura. Las filas con el mismo nombre y teléfono se agrupan
 // en un solo cliente y se envían a Google Sheets en lotes; el servidor valida y
 // asigna los números de cada cliente con las mismas reglas del registro manual.
 let cargaMasiva = {
@@ -274,9 +274,11 @@ function validarFilasMasivas(filas) {
     }
 
     const errores = [];
-    const clientesPorTelefono = new Map();
-    const facturasVistas = new Map(); // ID factura → { fila, telefono }
-    const telefonosConError = new Set();
+    // Un cliente = mismo nombre + mismo teléfono. Así, dos empresas que comparten teléfono
+    // (ej: "Alejandro A" y "Alejandro B") quedan como clientes separados con sus propias boletas.
+    const clientesPorClave = new Map();
+    const facturasVistas = new Map(); // ID factura → { fila, clave }
+    const clavesConError = new Set();
 
     for (let i = idxEncabezado + 1; i < filas.length; i++) {
         const fila = filas[i];
@@ -291,6 +293,8 @@ function validarFilasMasivas(filas) {
 
         const monto = leerMonto(fila[col.monto] ?? '');
         const telDigitos = telefono.replace(/\D/g, '');
+        // Mayúsculas, tildes y espacios de más no cuentan: "María  Torres" = "maria torres"
+        const clave = `${normalizarTexto(nombre).replace(/\s+/g, ' ')}|${telDigitos}`;
         const claveFactura = idFactura.toUpperCase();
         const problemas = [];
 
@@ -301,25 +305,20 @@ function validarFilasMasivas(filas) {
         if (idFactura && facturasVistas.has(claveFactura)) {
             const original = facturasVistas.get(claveFactura);
             problemas.push(`factura ${idFactura} repetida (también en la fila ${original.fila})`);
-            telefonosConError.add(original.telefono);
-        }
-
-        const cliente = clientesPorTelefono.get(telDigitos);
-        if (cliente && nombre && normalizarTexto(cliente.nombre) !== normalizarTexto(nombre)) {
-            problemas.push(`el teléfono ${telefono} ya aparece con el nombre "${cliente.nombre}"`);
+            clavesConError.add(original.clave);
         }
 
         if (problemas.length) {
             errores.push({ filas: [numFila], motivo: problemas.join('; ') });
-            if (telDigitos) telefonosConError.add(telDigitos);
+            clavesConError.add(clave);
             continue;
         }
 
-        facturasVistas.set(claveFactura, { fila: numFila, telefono: telDigitos });
-        if (!cliente) {
-            clientesPorTelefono.set(telDigitos, { nombre, telefono, facturas: [], totalComprado: 0, filas: [] });
+        facturasVistas.set(claveFactura, { fila: numFila, clave });
+        if (!clientesPorClave.has(clave)) {
+            clientesPorClave.set(clave, { nombre, telefono, facturas: [], totalComprado: 0, filas: [] });
         }
-        const c = clientesPorTelefono.get(telDigitos);
+        const c = clientesPorClave.get(clave);
         c.facturas.push({ id: idFactura, monto });
         c.totalComprado += monto;
         c.filas.push(numFila);
@@ -328,9 +327,9 @@ function validarFilasMasivas(filas) {
     // Mismas reglas del registro manual: un cliente con filas erróneas no se registra a medias,
     // y el total debe alcanzar al menos una boleta.
     const clientes = [];
-    for (const [tel, c] of clientesPorTelefono) {
-        if (telefonosConError.has(tel)) {
-            errores.push({ filas: c.filas, motivo: `${c.nombre}: no se registra hasta corregir los errores relacionados (otras filas del mismo teléfono o factura repetida)` });
+    for (const [clave, c] of clientesPorClave) {
+        if (clavesConError.has(clave)) {
+            errores.push({ filas: c.filas, motivo: `${c.nombre}: no se registra hasta corregir los errores relacionados (otras filas de este cliente o factura repetida)` });
             continue;
         }
         const boletas = Math.floor(c.totalComprado / VALOR_BOLETA);
